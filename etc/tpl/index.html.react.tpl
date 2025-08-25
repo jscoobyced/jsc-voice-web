@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
@@ -16,7 +16,7 @@
     <link media="all" rel="stylesheet" href="style.css" />
     <title>%VITE_APP_NAME%</title>
   </head>
-  <body>
+  <body class="bg-amber-50 dark:bg-gray-800 dark:text-amber-50 font-montserrat">
     <script>
       window.applicationData = {
         appVersion: '%VITE_APP_VERSION%',
