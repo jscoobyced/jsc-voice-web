@@ -21,8 +21,6 @@
     "noUncheckedSideEffectImports": true
   },
   "include": [
-    "src/**/*.ts",
-    "vite.config.ts",
-    "vitest.config.ts"],
+    "**/*.ts"],
   "exclude": ["node_modules", "coverage", "dist"]
 }

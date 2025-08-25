@@ -24,8 +24,11 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "src/**/*.tsx",
-    "src/**/*.ts",
-    "vite.config.ts"],
+    "**/*.tsx",
+    "**/*.ts",
+    "setup.ts",
+    "vite.config.ts",
+    "vitest.config.ts"
+  ],
   "exclude": ["node_modules", "coverage", "dist"]
 }

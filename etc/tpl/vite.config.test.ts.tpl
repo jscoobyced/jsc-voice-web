@@ -1,4 +1,3 @@
-/// <reference types="vitest" />
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -7,7 +6,7 @@ export default defineConfig({
     environment: 'jsdom',
     coverage: {
       extension: ['ts'],
-      exclude: ['src/main.ts', 'vite.config.ts'],
+      exclude: ['src/main.ts', 'setup.ts', 'vite.config.ts'],
     },
   },
 });

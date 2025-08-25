@@ -8,7 +8,7 @@ export default [
     ignores: ['coverage/**', 'dist/**', 'node_modules/**', 'vitest.config.ts'],
   },
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['**/*.{ts, tsx}'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {

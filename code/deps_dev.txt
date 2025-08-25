@@ -1,4 +1,5 @@
 @eslint/js
+@tailwindcss/vite
 @types/jest
 @types/node
 @types/react

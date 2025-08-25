@@ -1,14 +1,16 @@
-import { configDefaults, defineConfig, mergeConfig } from 'vitest/config';
-import viteConfig from './vite.config';
+/// <reference types="vitest" />
+import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from 'vite'
 
-export default mergeConfig(
-  viteConfig,
-  defineConfig({
-    test: {
-      exclude: [...configDefaults.exclude],
-      coverage: {
-        exclude: [...configDefaults.coverage.exclude!],
-      },
+export default defineConfig({
+  plugins: [tailwindcss()],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['setup.ts'],
+    coverage: {
+      extension: ['ts', 'tsx'],
+      exclude: ['src/main.ts', 'src/main.tsx', 'vite.config.ts'],
     },
-  }),
-);
+  },
+})
