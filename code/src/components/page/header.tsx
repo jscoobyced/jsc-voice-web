@@ -1,6 +1,6 @@
-import Title from './title'
+import Title from '../elements/title'
 
-const Header = () => {
+const Header: React.FC = () => {
   return (
     <header className="text-center">
       <Title title="The Story where you are the Hero" />
