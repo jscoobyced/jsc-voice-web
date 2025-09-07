@@ -1,37 +1,90 @@
 import { vi } from 'vitest'
-import audioSocket from './audioWebSocket'
+import AudioSocket from './audioWebSocket'
 
-describe('audioWebSocket', () => {
-  vi.mock('./applicationData', () => ({
-    getApplicationData: () => ({
-      serverWebSocket: 'http://localhost:3000',
-    }),
-  }))
+vi.mock('./applicationData', () => ({
+  getApplicationData: () => ({
+    appVersion: 'v0.0.0',
+    webSocketServer: 'localhost',
+    webSocketPort: 6789,
+    webSocketPath: '/audio',
+  }),
+}))
 
-  const emitMock = vi.fn()
+vi.mock('./playAudio', () => ({
+  playBuffer: (blob: Blob) => {
+    void blob
+  },
+}))
 
-  vi.mock('socket.io-client', () => {
-    const io = vi.fn(() => ({
-      on: vi.fn(),
-      emit: emitMock,
-      disconnect: vi.fn(),
-    }))
-    return {
-      default: io,
-    }
-  })
-
+describe('AudioSocket - success', () => {
   beforeEach(() => {
     vi.resetAllMocks()
   })
 
-  it('should create a socket and handle messages', () => {
-    const audioWs = audioSocket()
-    expect(audioWs).toHaveProperty('sendMessage')
-    audioWs.sendMessage(1, 'test data')
-    expect(emitMock).toHaveBeenCalledWith('message', {
-      type: 1,
-      data: 'test data',
+  it('should send text message', () => {
+    const expected = 'test data'
+    const audioWebSocket = new AudioSocket()
+    audioWebSocket.connect()
+    setTimeout(() => {
+      audioWebSocket.sendMessage(expected)
+    }, 1000)
+  })
+
+  it('should send binary message', () => {
+    const expected = new Uint8Array(8)
+    const audioWebSocket = new AudioSocket()
+    audioWebSocket.connect()
+    audioWebSocket.sendMessage(expected)
+  })
+
+  it('should send blob message', () => {
+    const expected = new Blob(['test'], { type: 'text/plain' })
+    const audioWebSocket = new AudioSocket()
+    audioWebSocket.connect()
+    audioWebSocket.sendBlob(expected)
+  })
+})
+
+describe('audioWebSocket - empty message', () => {
+  let mockedConsoleError: ReturnType<typeof vi.spyOn>
+  let mockedConsoleLog: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    vi.resetAllMocks()
+    mockedConsoleError = vi.spyOn(console, 'error').mockImplementation(() => {
+      // do nothing
     })
+    mockedConsoleLog = vi.spyOn(console, 'log').mockImplementation(() => {
+      // do nothing
+    })
+  })
+
+  afterEach(() => {
+    mockedConsoleError.mockRestore()
+    mockedConsoleLog.mockRestore()
+  })
+
+  it('should not send empty text message', () => {
+    const expected = ''
+    const audioWebSocket = new AudioSocket()
+    audioWebSocket.connect()
+    audioWebSocket.sendMessage(expected)
+    expect(mockedConsoleError).toHaveBeenCalledTimes(1)
+  })
+
+  it('should not send empty binary message', () => {
+    const expected = new Uint8Array(0)
+    const audioWebSocket = new AudioSocket()
+    audioWebSocket.connect()
+    audioWebSocket.sendMessage(expected)
+    expect(mockedConsoleError).toHaveBeenCalledTimes(1)
+  })
+
+  it('should not send message if socket is not open', () => {
+    const expected = new Uint8Array(0)
+    const audioWebSocket = new AudioSocket()
+    audioWebSocket.connect()
+    audioWebSocket.sendMessage(expected)
+    expect(mockedConsoleError).toHaveBeenCalledTimes(1)
   })
 })

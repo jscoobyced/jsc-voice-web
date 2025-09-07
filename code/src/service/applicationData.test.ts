@@ -10,12 +10,18 @@ describe('applicationData', () => {
   it('should return the window.applicationData', () => {
     const applicationData: IApplicationData = {
       appVersion: 'test',
-      serverWebSocket: 'ws://localhost:3000',
+      webSocketServer: 'localhost',
+      webSocketPort: 8080,
+      webSocketPath: '/audio',
     }
     // @ts-expect-error - Mock for what we inject this property in index.html
     window.applicationData = applicationData
     const result = getApplicationData()
     expect(result.appVersion).toBe(applicationData.appVersion)
-    expect(result.serverWebSocket).toBe(applicationData.serverWebSocket)
+    expect(result.webSocketServer).toBe(applicationData.webSocketServer)
+    expect(result.webSocketPort).toBe(applicationData.webSocketPort)
+    expect(result.webSocketPath).toBe(applicationData.webSocketPath)
+    // @ts-expect-error - Clean up mock
+    delete window.applicationData
   })
 })

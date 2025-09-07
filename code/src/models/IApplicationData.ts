@@ -1,4 +1,6 @@
 export interface IApplicationData {
   appVersion: string
-  serverWebSocket: string
+  webSocketServer: string
+  webSocketPort: number
+  webSocketPath: string
 }

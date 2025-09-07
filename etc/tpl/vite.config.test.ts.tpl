@@ -6,7 +6,12 @@ export default defineConfig({
     environment: 'jsdom',
     coverage: {
       extension: ['ts'],
-      exclude: ['src/main.ts', 'setup.ts', 'vite.config.ts'],
+      exclude: [
+        'src/main.ts',
+        'src/main.tsx',
+        'vite.config.ts',
+        'src/server/**',
+      ],
     },
   },
 });
