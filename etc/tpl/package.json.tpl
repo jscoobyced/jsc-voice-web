@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "test": "vitest",
     "lint": "eslint .",
-    "pretty": "prettier --write ."
+    "pretty": "prettier --write .",
+    "server": "vite-node ./src/server/index.ts"
   }
 }

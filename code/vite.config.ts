@@ -10,7 +10,13 @@ export default defineConfig({
     setupFiles: ['setup.ts'],
     coverage: {
       extension: ['ts', 'tsx'],
-      exclude: ['src/main.ts', 'src/main.tsx', 'vite.config.ts'],
+      exclude: [
+        'src/main.ts',
+        'src/main.tsx',
+        'vite.config.ts',
+        'src/server/**',
+        'src/mocks/**',
+      ],
     },
   },
 })
