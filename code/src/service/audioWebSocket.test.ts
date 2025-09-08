@@ -16,6 +16,32 @@ vi.mock('./playAudio', () => ({
   },
 }))
 
+// Mock the WebSocket class
+let readyState = 1
+vi.stubGlobal(
+  'WebSocket',
+  class {
+    static OPEN = 1
+    readyState = readyState
+    url: string
+    onopen: ((this: WebSocket, ev: Event) => any) | null = null
+    onmessage: ((this: WebSocket, ev: MessageEvent) => any) | null = null
+
+    constructor(url: string) {
+      this.url = url
+    }
+
+    send(data: string | Uint8Array | Blob) {
+      void data
+      // do nothing
+    }
+
+    close() {
+      // do nothing
+    }
+  },
+)
+
 describe('AudioSocket - success', () => {
   beforeEach(() => {
     vi.resetAllMocks()
@@ -25,9 +51,7 @@ describe('AudioSocket - success', () => {
     const expected = 'test data'
     const audioWebSocket = new AudioSocket()
     audioWebSocket.connect()
-    setTimeout(() => {
-      audioWebSocket.sendMessage(expected)
-    }, 1000)
+    audioWebSocket.sendMessage(expected)
   })
 
   it('should send binary message', () => {
@@ -80,11 +104,21 @@ describe('audioWebSocket - empty message', () => {
     expect(mockedConsoleError).toHaveBeenCalledTimes(1)
   })
 
+  it('should not send empty binary message', () => {
+    const audioWebSocket = new AudioSocket()
+    audioWebSocket.connect()
+    audioWebSocket.sendBlob(new Blob())
+    expect(mockedConsoleError).toHaveBeenCalledTimes(1)
+  })
+
   it('should not send message if socket is not open', () => {
+    readyState = 0
     const expected = new Uint8Array(0)
     const audioWebSocket = new AudioSocket()
     audioWebSocket.connect()
     audioWebSocket.sendMessage(expected)
-    expect(mockedConsoleError).toHaveBeenCalledTimes(1)
+    audioWebSocket.sendBlob(new Blob())
+    expect(mockedConsoleError).toHaveBeenCalledTimes(2)
+    readyState = 1
   })
 })
