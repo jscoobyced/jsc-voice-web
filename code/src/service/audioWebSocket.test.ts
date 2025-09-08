@@ -24,8 +24,8 @@ vi.stubGlobal(
     static OPEN = 1
     readyState = readyState
     url: string
-    onopen: ((this: WebSocket, ev: Event) => any) | null = null
-    onmessage: ((this: WebSocket, ev: MessageEvent) => any) | null = null
+    onopen: ((this: WebSocket, ev: Event) => void) | null = null
+    onmessage: ((this: WebSocket, ev: MessageEvent) => void) | null = null
 
     constructor(url: string) {
       this.url = url
