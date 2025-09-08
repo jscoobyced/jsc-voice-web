@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import AudioSocket from '../../service/audioWebSocket'
 import Recorder from '../../service/recorder'
 
@@ -7,9 +7,12 @@ const AudioRecorder: React.FC = () => {
   const audioSocketService = new AudioSocket()
   const recorder = useRef(new Recorder())
 
-  const startRecord = async () => {
+  useEffect(() => {
     audioSocketService.connect()
     recorder.current.setCallback(audioSocketService.sendBlob)
+  }, [])
+
+  const startRecord = async () => {
     await recorder.current.startRecording()
     setIsRecording(true)
   }

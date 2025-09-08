@@ -35,13 +35,12 @@ vi.mock('../../service/audioWebSocket', () => {
 describe('Recorded component', () => {
   it('can start and stop recording', async () => {
     render(<AudioRecorder />)
-    expect(mockConnect).not.toHaveBeenCalled()
+    expect(mockConnect).toHaveBeenCalled()
     const recordButton = screen.getByRole('button', { name: 'Record' })
     expect(recordButton).toBeInTheDocument()
     await act(async () => {
       fireEvent.click(recordButton)
     })
-    expect(mockConnect).toHaveBeenCalled()
     expect(mockSetCallback).toHaveBeenCalledWith(mockSendBlob)
     expect(mockStartRecording).toHaveBeenCalled()
     const stopButton = screen.getByRole('button', { name: 'Stop' })
