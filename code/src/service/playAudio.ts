@@ -8,6 +8,10 @@ export const playBuffer = (blob: Blob) => {
     source.connect(audioContext.destination)
     source.start()
     source.buffer = audioBuffer
+    source.onended = async () => {
+      await audioContext.close()
+      source.disconnect()
+    }
   }
   reader.readAsArrayBuffer(blob)
 }

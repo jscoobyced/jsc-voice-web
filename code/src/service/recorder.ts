@@ -33,6 +33,7 @@ class Recorder {
   stopRecording = () => {
     if (this.mediaRecorder && this.isRecording) {
       this.mediaRecorder.stop()
+      this.mediaRecorder.stream.getTracks().forEach((track) => { track.stop(); })
       this.isRecording = false
     }
   }
