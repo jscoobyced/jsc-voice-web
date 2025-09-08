@@ -9,11 +9,21 @@ vi.stubGlobal('navigator', {
   },
 })
 
+vi.stubGlobal(
+  'MediaStream',
+  class MediaStream {
+    getTracks() {
+      return []
+    }
+  },
+)
+
 // Mock MediaRecorder
 class MockMediaRecorder {
   ondataavailable: ((event: BlobEvent) => void) | null = null
   onstop: (() => void) | null = null
   isRecording = false
+  stream?: MediaStream = new MediaStream()
 
   constructor(stream: MediaStream) {
     void stream
