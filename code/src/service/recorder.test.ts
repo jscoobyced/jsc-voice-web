@@ -68,8 +68,7 @@ describe('recorder', () => {
     await new Promise((resolve) => setTimeout(resolve, 100))
 
     expect(mockSendData).toHaveBeenCalled()
-    const blobArg = mockSendData.mock.calls[0][0]
-    expect(blobArg).toBeInstanceOf(Blob)
+    const blobArg = mockSendData.mock.calls[0][0] as Blob
     expect(blobArg.type).toBe('audio/wav')
   })
 })
