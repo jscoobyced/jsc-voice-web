@@ -1,4 +1,4 @@
-[![codecov](https://codecov.io/gh/jscoobyced/jsc-vite-typescript/graph/badge.svg?token=5MLIJ65VBL)](https://codecov.io/gh/jscoobyced/jsc-vite-typescript)
+[![codecov](https://codecov.io/gh/jscoobyced/jsc-voice-web/graph/badge.svg?token=GGSIN6EJMA)](https://codecov.io/gh/jscoobyced/jsc-voice-web)
 
 ## Simple Typescript application with Vite
 
