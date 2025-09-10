@@ -79,6 +79,6 @@ describe('recorder', () => {
 
     expect(mockSendData).toHaveBeenCalled()
     const blobArg = mockSendData.mock.calls[0][0] as Blob
-    expect(blobArg.type).toBe('audio/wav')
+    expect(blobArg.type).toBe('audio/webm')
   })
 })

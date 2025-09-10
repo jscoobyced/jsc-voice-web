@@ -12,14 +12,17 @@ class Recorder {
   startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      this.mediaRecorder = new MediaRecorder(stream)
+      this.mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'audio/webm;codecs=opus', // Most supported by all browsers
+        audioBitsPerSecond: 16000 * 4, // 16kHz * 4 bits = 64kbps
+      })
       const chunks: Blob[] = []
       this.mediaRecorder.ondataavailable = (e) => {
         chunks.push(e.data)
       }
 
       this.mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'audio/wav' })
+        const blob = new Blob(chunks, { type: 'audio/webm' })
         this.sendData(blob)
       }
 
@@ -33,7 +36,9 @@ class Recorder {
   stopRecording = () => {
     if (this.mediaRecorder && this.isRecording) {
       this.mediaRecorder.stop()
-      this.mediaRecorder.stream.getTracks().forEach((track) => { track.stop(); })
+      this.mediaRecorder.stream.getTracks().forEach((track) => {
+        track.stop()
+      })
       this.isRecording = false
     }
   }

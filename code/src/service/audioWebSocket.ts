@@ -1,5 +1,4 @@
 import { getApplicationData } from './applicationData'
-import { playBuffer } from './playAudio'
 
 export interface ServerMessage {
   type: number
@@ -12,7 +11,7 @@ class AudioSocket {
     : 'ws://localhost:6789/audio'
   socket?: WebSocket
 
-  connect = () => {
+  connect = (callback?: (data: string | ArrayBuffer) => void) => {
     this.socket = new WebSocket(this.serverUrl)
 
     this.socket.onopen = (event: Event) => {
@@ -20,8 +19,10 @@ class AudioSocket {
     }
 
     this.socket.onmessage = (event: MessageEvent) => {
-      const blob = new Blob([event.data], { type: 'audio/wav' })
-      playBuffer(blob)
+      if (callback) {
+        callback(event.data as string | ArrayBuffer)
+      } else if (event.data instanceof Blob) {
+      }
     }
   }
 
