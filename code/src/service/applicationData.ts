@@ -8,6 +8,7 @@ export const getApplicationData = () => {
   }
   return {
     appVersion: 'v0.0.0',
+    webSocketScheme: '',
     webSocketServer: '',
     webSocketPort: 0,
     webSocketPath: '',

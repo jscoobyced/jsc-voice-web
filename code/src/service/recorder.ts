@@ -29,7 +29,8 @@ class Recorder {
       this.mediaRecorder.start()
       this.isRecording = true
     } catch (err) {
-      console.error('Error accessing microphone:', err)
+      const error = err as Error
+      console.error('Error accessing microphone:', error.message)
     }
   }
 

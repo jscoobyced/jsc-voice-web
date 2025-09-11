@@ -8,9 +8,9 @@ on:
     types: [published]
 
 env:
-  IMAGE_NAME: jsc-vite-ts
-  IMAGE_TITLE: Simple Typescript application with Vite
-  IMAGE_DESCRIPTION: This is the image for Simple Typescript application with Vite.
+  IMAGE_NAME: jsc-voice-web
+  IMAGE_TITLE: JSC Voice Web - A story where you are the hero
+  IMAGE_DESCRIPTION: Start the application to have a conversation with an AI powered story teller that will let you be the hero of the story.
   SRC_PATH: code/
   DOCKERFILE_PATH: etc/docker/Dockerfile
 

@@ -13,11 +13,13 @@ describe('applicationData', () => {
       webSocketServer: 'localhost',
       webSocketPort: 8080,
       webSocketPath: '/audio',
+      webSocketScheme: 'ws',
     }
     // @ts-expect-error - Mock for what we inject this property in index.html
     window.applicationData = applicationData
     const result = getApplicationData()
     expect(result.appVersion).toBe(applicationData.appVersion)
+    expect(result.webSocketScheme).toBe(applicationData.webSocketScheme)
     expect(result.webSocketServer).toBe(applicationData.webSocketServer)
     expect(result.webSocketPort).toBe(applicationData.webSocketPort)
     expect(result.webSocketPath).toBe(applicationData.webSocketPath)
