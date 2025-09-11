@@ -2,9 +2,21 @@ import { act, fireEvent, render, screen } from '@testing-library/react'
 import { vi } from 'vitest'
 import AudioRecorder from './audioRecorder'
 
+let callbackMethod: (data: string | ArrayBuffer) => void
+const mockText = 'test mock data'
+const mockBlob = new ArrayBuffer(5)
 const mockSetCallback = vi.fn()
 const mockStartRecording = vi.fn().mockResolvedValue(undefined)
-const mockStopRecording = vi.fn()
+const mockStopRecording = vi.fn().mockImplementation(() => {
+  callbackMethod(mockText)
+  callbackMethod(mockBlob)
+})
+
+vi.mock('../../service/playAudio', () => {
+  return {
+    playBuffer: vi.fn(),
+  }
+})
 
 vi.mock('../../service/recorder', () => {
   return {
@@ -18,7 +30,12 @@ vi.mock('../../service/recorder', () => {
   }
 })
 
-const mockConnect = vi.fn()
+const mockConnect = vi
+  .fn()
+  .mockImplementation((callback: (data: string | ArrayBuffer) => void) => {
+    callbackMethod = callback
+  })
+
 const mockSendBlob = vi.fn()
 
 vi.mock('../../service/audioWebSocket', () => {

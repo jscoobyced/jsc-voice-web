@@ -7,7 +7,7 @@ export interface ServerMessage {
 
 class AudioSocket {
   serverUrl = getApplicationData().webSocketServer
-    ? `ws://${getApplicationData().webSocketServer}:${getApplicationData().webSocketPort.toString()}${getApplicationData().webSocketPath}`
+    ? `${getApplicationData().webSocketScheme}://${getApplicationData().webSocketServer}:${getApplicationData().webSocketPort.toString()}${getApplicationData().webSocketPath}`
     : 'ws://localhost:6789/audio'
   socket?: WebSocket
 

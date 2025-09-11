@@ -81,4 +81,25 @@ describe('recorder', () => {
     const blobArg = mockSendData.mock.calls[0][0] as Blob
     expect(blobArg.type).toBe('audio/webm')
   })
+
+  it('does not crash when and exception occurs', () => {
+    const expectedError = Error('Expected error')
+    vi.stubGlobal('navigator', {
+      mediaDevices: {
+        getUserMedia: () => {
+          throw expectedError
+        },
+      },
+    })
+    const recorder = new Recorder()
+    const mockSendData = vi.fn()
+    recorder.setCallback(mockSendData)
+
+    // Assert
+    expect(async () => {
+      await recorder.startRecording()
+    }).not.toThrow(
+      Error(`Error accessing microphone: ${expectedError.message}`),
+    )
+  })
 })

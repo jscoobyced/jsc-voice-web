@@ -20,6 +20,7 @@
     <script>
       window.applicationData = {
         appVersion: '%VITE_APP_VERSION%',
+        webSocketScheme: '%VITE_SERVER_WEBSOCKET_SCHEME%',
         webSocketServer: '%VITE_SERVER_WEBSOCKET_SERVER%',
         webSocketPort: '%VITE_SERVER_WEBSOCKET_PORT%',
         webSocketPath: '%VITE_SERVER_WEBSOCKET_PATH%',

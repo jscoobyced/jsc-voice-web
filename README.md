@@ -1,8 +1,8 @@
 [![codecov](https://codecov.io/gh/jscoobyced/jsc-voice-web/graph/badge.svg?token=GGSIN6EJMA)](https://codecov.io/gh/jscoobyced/jsc-voice-web)
 
-## Simple Typescript application with Vite
+## JSC Voice Web - A story where you are the hero
 
-This is a template project to quickly create a Typescript application with Vite.
+Start the application to have a conversation with an AI powered story teller that will let you be the hero of the story.
 
 # Quick Start
 
