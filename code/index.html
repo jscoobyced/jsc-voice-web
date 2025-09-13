@@ -13,7 +13,6 @@
     <meta property="og:image:height" content="%VITE_APP_IMAGE_HEIGHT%" />
     <meta property="og:image:width" content="%VITE_APP_IMAGE_WIDTH%" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link media="all" rel="stylesheet" href="style.css" />
     <title>%VITE_APP_NAME%</title>
   </head>
   <body class="bg-amber-50 dark:bg-gray-800 dark:text-amber-50 font-montserrat">

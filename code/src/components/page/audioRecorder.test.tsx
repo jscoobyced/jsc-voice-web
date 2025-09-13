@@ -3,12 +3,14 @@ import { vi } from 'vitest'
 import AudioRecorder from './audioRecorder'
 
 let callbackMethod: (data: string | ArrayBuffer) => void
-const mockText = 'test mock data'
+const mockUserText = '{"type": "user", "content": "test mock data"}'
+const mockTellerText = '{"type": "teller", "content": "test mock data"}'
 const mockBlob = new ArrayBuffer(5)
 const mockSetCallback = vi.fn()
 const mockStartRecording = vi.fn().mockResolvedValue(undefined)
 const mockStopRecording = vi.fn().mockImplementation(() => {
-  callbackMethod(mockText)
+  callbackMethod(mockUserText)
+  callbackMethod(mockTellerText)
   callbackMethod(mockBlob)
 })
 
