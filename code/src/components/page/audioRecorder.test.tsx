@@ -39,6 +39,7 @@ const mockConnect = vi
   })
 
 const mockSendBlob = vi.fn()
+const mockDisconnect = vi.fn()
 
 vi.mock('../../service/audioWebSocket', () => {
   return {
@@ -46,6 +47,7 @@ vi.mock('../../service/audioWebSocket', () => {
       return {
         connect: mockConnect,
         sendBlob: mockSendBlob,
+        disconnect: mockDisconnect,
       }
     }),
   }
@@ -54,7 +56,14 @@ vi.mock('../../service/audioWebSocket', () => {
 describe('Recorded component', () => {
   it('can start and stop recording', async () => {
     render(<AudioRecorder />)
+    const connectButton = screen.getByRole('button', { name: 'Connect' })
+    expect(connectButton).toBeInTheDocument()
+    await act(async () => {
+      fireEvent.click(connectButton)
+    })
     expect(mockConnect).toHaveBeenCalled()
+    const disconnectButton = screen.getByRole('button', { name: 'Disconnect' })
+    expect(disconnectButton).toBeInTheDocument()
     const recordButton = screen.getByRole('button', { name: 'Record' })
     expect(recordButton).toBeInTheDocument()
     await act(async () => {
@@ -66,5 +75,9 @@ describe('Recorded component', () => {
     expect(stopButton).toBeInTheDocument()
     fireEvent.click(stopButton)
     expect(mockStopRecording).toHaveBeenCalled()
+    await act(async () => {
+      fireEvent.click(disconnectButton)
+    })
+    expect(mockDisconnect).toHaveBeenCalled()
   })
 })
