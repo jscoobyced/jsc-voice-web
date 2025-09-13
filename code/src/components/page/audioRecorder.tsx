@@ -12,6 +12,8 @@ const AudioRecorder: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false)
   const [tellerMessage, setTellerMessage] = useState('')
   const [userMessage, setUserMessage] = useState('')
+  const [connect, setConnect] = useState('Connect')
+  const [isConnected, setIsConnected] = useState(false)
   const audioSocketService = new AudioSocket()
   const recorder = useRef(new Recorder())
 
@@ -26,10 +28,7 @@ const AudioRecorder: React.FC = () => {
     }
   }
 
-  useEffect(() => {
-    audioSocketService.connect(updateMessage)
-    recorder.current.setCallback(audioSocketService.sendBlob)
-  }, [])
+  useEffect(() => {}, [])
 
   const startRecord = async () => {
     await recorder.current.startRecording()
@@ -41,9 +40,25 @@ const AudioRecorder: React.FC = () => {
     setIsRecording(false)
   }
 
+  const doConnect = () => {
+    if (!isConnected) {
+      audioSocketService.connect(updateMessage)
+      recorder.current.setCallback(audioSocketService.sendBlob)
+      setIsConnected(true)
+      setConnect('Disconnect')
+    } else {
+      audioSocketService.disconnect()
+      setIsConnected(false)
+      setConnect('Connect')
+    }
+  }
+
   return (
     <>
       <div className="text-center">
+        <button className="p-10 m-5" onClick={doConnect}>
+          {connect}
+        </button>
         <button
           className="p-10 m-5"
           onClick={startRecord}

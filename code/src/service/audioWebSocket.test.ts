@@ -52,13 +52,7 @@ describe('AudioSocket - success', () => {
     const audioWebSocket = new AudioSocket()
     audioWebSocket.connect()
     audioWebSocket.sendMessage(expected)
-  })
-
-  it('should send binary message', () => {
-    const expected = new Uint8Array(8)
-    const audioWebSocket = new AudioSocket()
-    audioWebSocket.connect()
-    audioWebSocket.sendMessage(expected)
+    audioWebSocket.disconnect()
   })
 
   it('should send blob message', () => {
@@ -97,14 +91,6 @@ describe('audioWebSocket - empty message', () => {
   })
 
   it('should not send empty binary message', () => {
-    const expected = new Uint8Array(0)
-    const audioWebSocket = new AudioSocket()
-    audioWebSocket.connect()
-    audioWebSocket.sendMessage(expected)
-    expect(mockedConsoleError).toHaveBeenCalledTimes(1)
-  })
-
-  it('should not send empty binary message', () => {
     const audioWebSocket = new AudioSocket()
     audioWebSocket.connect()
     audioWebSocket.sendBlob(new Blob())
@@ -113,7 +99,7 @@ describe('audioWebSocket - empty message', () => {
 
   it('should not send message if socket is not open', () => {
     readyState = 0
-    const expected = new Uint8Array(0)
+    const expected = 'Hello'
     const audioWebSocket = new AudioSocket()
     audioWebSocket.connect()
     audioWebSocket.sendMessage(expected)

@@ -1,10 +1,5 @@
 import { getApplicationData } from './applicationData'
 
-export interface ServerMessage {
-  type: number
-  data: string | ArrayBufferLike[]
-}
-
 class AudioSocket {
   serverUrl = getApplicationData().webSocketServer
     ? `${getApplicationData().webSocketScheme}://${getApplicationData().webSocketServer}:${getApplicationData().webSocketPort.toString()}${getApplicationData().webSocketPath}`
@@ -26,6 +21,10 @@ class AudioSocket {
     }
   }
 
+  disconnect = () => {
+    this.socket?.close()
+  }
+
   sendMessage = (data: string | Uint8Array) => {
     if (this.socket?.readyState !== WebSocket.OPEN) {
       console.error(
@@ -35,15 +34,14 @@ class AudioSocket {
       )
       return
     }
-    if (typeof data === 'string' && data.length === 0) {
-      console.error('Cannot send empty string data')
-      return
+    if (typeof data === 'string') {
+      if (data.length === 0) {
+        console.error('Cannot send empty string data')
+        return
+      } else {
+        this.socket.send(data)
+      }
     }
-    if (data instanceof Uint8Array && data.length === 0) {
-      console.error('Cannot send empty array data')
-      return
-    }
-    this.socket.send(data)
   }
 
   sendBlob = (data: Blob) => {
