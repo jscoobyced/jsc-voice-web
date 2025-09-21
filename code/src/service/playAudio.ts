@@ -1,4 +1,4 @@
-export const playBuffer = (blob: Blob) => {
+export const playBuffer = (blob: Blob, callback: () => void) => {
   const audioContext = new AudioContext()
   const source = audioContext.createBufferSource()
   const reader = new FileReader()
@@ -11,6 +11,7 @@ export const playBuffer = (blob: Blob) => {
     source.onended = async () => {
       await audioContext.close()
       source.disconnect()
+      callback()
     }
   }
   reader.readAsArrayBuffer(blob)

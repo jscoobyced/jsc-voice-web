@@ -18,6 +18,29 @@ vi.stubGlobal(
   },
 )
 
+vi.stubGlobal(
+  'AudioContext',
+  class AudioContext {
+    createMediaStreamSource = (stream: MediaStream) => {
+      void stream
+      return {
+        connect(anaylser: AnalyserNode) {
+          void anaylser
+        },
+      }
+    }
+    createAnalyser = () => {
+      class Analyser {
+        fftSize = 0
+        disconnect = () => {
+          // Do nothing
+        }
+      }
+      return new Analyser()
+    }
+  },
+)
+
 // Mock MediaRecorder
 class MockMediaRecorder {
   ondataavailable: ((event: BlobEvent) => void) | null = null

@@ -1,12 +1,23 @@
 class Recorder {
   mediaRecorder: MediaRecorder | null = null
   isRecording = false
+  analyser: AnalyserNode | null = null
+
   sendData = (blob: Blob) => {
     void blob
   }
 
   setCallback = (sendData: (blob: Blob) => void) => {
     this.sendData = sendData
+  }
+
+  getVolume = () => {
+    if (!this.analyser) return -1
+    const binCount = this.analyser.frequencyBinCount
+    const dataArray = new Uint8Array(binCount)
+    this.analyser.getByteFrequencyData(dataArray)
+
+    return Math.max(...dataArray)
   }
 
   startRecording = async () => {
@@ -16,6 +27,11 @@ class Recorder {
         mimeType: 'audio/webm;codecs=opus', // Most supported by all browsers
         audioBitsPerSecond: 16000 * 4, // 16kHz * 4 bits = 64kbps
       })
+      const audioContext = new AudioContext()
+      const source = audioContext.createMediaStreamSource(stream)
+      this.analyser = audioContext.createAnalyser()
+      source.connect(this.analyser)
+      this.analyser.fftSize = 128
       const chunks: Blob[] = []
       this.mediaRecorder.ondataavailable = (e) => {
         chunks.push(e.data)
@@ -36,6 +52,7 @@ class Recorder {
 
   stopRecording = () => {
     if (this.mediaRecorder && this.isRecording) {
+      this.analyser?.disconnect()
       this.mediaRecorder.stop()
       this.mediaRecorder.stream.getTracks().forEach((track) => {
         track.stop()
