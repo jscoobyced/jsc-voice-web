@@ -33,7 +33,9 @@ describe('playAudio', () => {
 
   it('should play audio from a Blob', async () => {
     const blob = new Blob(['test'], { type: 'audio/wav' })
-    playBuffer(blob)
+    playBuffer(blob, () => {
+      // Do nothing
+    })
     // Wait for the async operations to complete
     await new Promise((resolve) => setTimeout(resolve, 100))
 
