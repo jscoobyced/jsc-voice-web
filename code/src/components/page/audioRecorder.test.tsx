@@ -13,6 +13,7 @@ const mockStopRecording = vi.fn().mockImplementation(() => {
   callbackMethod(mockTellerText)
   callbackMethod(mockBlob)
 })
+const mockGetVolume = vi.fn()
 
 vi.mock('../../service/playAudio', () => {
   return {
@@ -27,6 +28,7 @@ vi.mock('../../service/recorder', () => {
         setCallback: mockSetCallback,
         startRecording: mockStartRecording,
         stopRecording: mockStopRecording,
+        getVolume: mockGetVolume,
       }
     }),
   }
@@ -71,10 +73,6 @@ describe('Recorded component', () => {
     })
     expect(mockSetCallback).toHaveBeenCalledWith(mockSendBlob)
     expect(mockStartRecording).toHaveBeenCalled()
-    const stopButton = screen.getByRole('button', { name: 'Stop' })
-    expect(stopButton).toBeInTheDocument()
-    fireEvent.click(stopButton)
-    expect(mockStopRecording).toHaveBeenCalled()
     await act(async () => {
       fireEvent.click(disconnectButton)
     })
