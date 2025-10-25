@@ -9,7 +9,7 @@ interface StoryResponse {
 }
 
 const SPEAKING_VOLUME = 190
-const TOTAL_SPEAK_TIME = 5000
+const TOTAL_SPEAK_TIME = 10000
 const TOTAL_SILENT_TIME = 3000
 
 const AudioRecorder: React.FC = () => {
@@ -19,7 +19,7 @@ const AudioRecorder: React.FC = () => {
   const [isConnected, setIsConnected] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isCurrentlyRecording, setIsCurrentlyRecording] = useState(false)
-  const audioSocketService = new AudioSocket()
+  const [audioSocketService] = useState(new AudioSocket())
   const recorder = useRef(new Recorder())
 
   const updateMessage = (data: any) => {
@@ -29,7 +29,7 @@ const AudioRecorder: React.FC = () => {
       if (response.type === 'user') setUserMessage(response.content)
     } else {
       const blob = new Blob([data], { type: 'audio/wav' })
-      playBuffer(blob, startRecord)
+      playBuffer(blob, async () => await startRecord(true, false))
     }
   }
 
@@ -61,8 +61,11 @@ const AudioRecorder: React.FC = () => {
     }
   }, [isCurrentlyRecording])
 
-  const startRecord = async () => {
-    if (isConnected && !isPlaying) {
+  const startRecord = async (
+    isCurrentlyConnected = false,
+    isCurrentlyPlaying = false,
+  ) => {
+    if (isCurrentlyConnected && !isCurrentlyPlaying) {
       setIsPlaying(true)
       await recorder.current.startRecording()
       setIsCurrentlyRecording(true)
@@ -70,6 +73,7 @@ const AudioRecorder: React.FC = () => {
   }
 
   const stopRecording = () => {
+    setIsPlaying(false)
     setIsCurrentlyRecording(false)
     recorder.current.stopRecording()
   }
@@ -99,7 +103,7 @@ const AudioRecorder: React.FC = () => {
         </button>
         <button
           className="p-10 m-5"
-          onClick={startRecord}
+          onClick={async () => await startRecord(isConnected, isPlaying)}
           disabled={isCurrentlyRecording}
         >
           Record
