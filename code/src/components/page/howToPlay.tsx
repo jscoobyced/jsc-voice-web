@@ -26,10 +26,10 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ className }) => {
 
       <ul className="mt-4 space-y-6 list-none list-inside text-sm sm:text-base leading-relaxed marker:font-semibold marker:text-indigo-600 dark:marker:text-indigo-400">
         <li>
-          <strong>Connect 🔌</strong>
+          <strong>Start Playing 🔌</strong>
           <p>
-            Tap the "Connect" button to link up with the server. Wait until the
-            status shows "Idle" ✅ before you begin.
+            Tap the "Start Playing" button to link up with the server. Wait
+            until the status shows "Idle" ✅ before you begin.
           </p>
         </li>
         <li>
@@ -61,8 +61,8 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ className }) => {
         <li>
           <strong>Finish 🛑</strong>
           <p>
-            To end the session, say "Stop" or press the stop control. You can
-            reconnect anytime to start a brand new adventure. 🎉
+            To end the session, say "Stop Recording" or press the stop control.
+            You can reconnect anytime to start a brand new adventure. 🎉
           </p>
         </li>
         <li>
