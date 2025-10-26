@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import AudioSocket from '../../service/audioWebSocket'
 import { playBuffer } from '../../service/playAudio'
 import Recorder from '../../service/recorder'
+import CustomButton from '../elements/CustomButton'
+import CustomContent from '../elements/CustomContent'
 
 interface StoryResponse {
   type: string
@@ -15,7 +17,7 @@ const TOTAL_SILENT_TIME = 3000
 const AudioRecorder: React.FC = () => {
   const [tellerMessage, setTellerMessage] = useState('')
   const [userMessage, setUserMessage] = useState('')
-  const [connect, setConnect] = useState('Connect')
+  const [connect, setConnect] = useState('Start playing')
   const [isConnected, setIsConnected] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isCurrentlyRecording, setIsCurrentlyRecording] = useState(false)
@@ -87,47 +89,41 @@ const AudioRecorder: React.FC = () => {
       audioSocketService.connect(updateMessage)
       recorder.current.setCallback(audioSocketService.sendBlob)
       setIsConnected(true)
-      setConnect('Disconnect')
+      setConnect('Stop playing')
     } else {
       audioSocketService.disconnect()
       setIsConnected(false)
-      setConnect('Connect')
+      setConnect('Start playing')
     }
   }
 
   return (
     <>
       <div className="text-center">
-        <button className="p-10 m-5" onClick={doConnect}>
-          {connect}
-        </button>
-        <button
-          className="p-10 m-5"
+        <CustomButton onClick={doConnect}>{connect} 🔌</CustomButton>
+        <CustomButton
           onClick={async () => await startRecord(isConnected, isPlaying)}
-          disabled={isCurrentlyRecording}
+          disabled={isCurrentlyRecording || !isConnected || isPlaying}
         >
-          Record
-        </button>
-        <button
-          className="p-10 m-5"
+          Record 🎙️
+        </CustomButton>
+        <CustomButton
           onClick={stopPlaying}
-          disabled={!isPlaying}
+          disabled={!isPlaying || !isConnected}
         >
-          Stop
-        </button>
-        <div className="pt-4">
-          Status: {isCurrentlyRecording ? 'Recording' : 'Idle'}
-        </div>
+          Stop Recording ⏹️
+        </CustomButton>
+        <span className="block mb-2 font-mono">
+          {!isConnected
+            ? 'Disconnected 🚫'
+            : isCurrentlyRecording
+              ? 'Recording 🎤'
+              : 'Idle 😴'}
+        </span>
       </div>
-      <div className="flex justify-center items-center">
-        <pre className="pt-4 font-mono w-1/2 whitespace-normal bg-cyan-950 p-5">
-          {userMessage ? userMessage : ''}
-        </pre>
-      </div>
-      <div className="flex justify-center items-center">
-        <pre className="pt-4 font-mono w-1/2 whitespace-pre-wrap bg-cyan-950 p-5">
-          {tellerMessage ? tellerMessage : ''}
-        </pre>
+      <div className="flex flex-col items-center justify-center text-center w-full space-y-2">
+        <CustomContent text={userMessage} />
+        <CustomContent text={tellerMessage} />
       </div>
     </>
   )
