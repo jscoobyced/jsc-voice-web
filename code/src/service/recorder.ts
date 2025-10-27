@@ -2,6 +2,7 @@ class Recorder {
   mediaRecorder: MediaRecorder | null = null
   isRecording = false
   analyser: AnalyserNode | null = null
+  hasSpoken = false
 
   sendData = (blob: Blob) => {
     void blob
@@ -38,6 +39,10 @@ class Recorder {
       }
 
       this.mediaRecorder.onstop = () => {
+        if (!this.hasSpoken) {
+          this.hasSpoken = false
+          return
+        }
         const blob = new Blob(chunks, { type: 'audio/webm' })
         this.sendData(blob)
       }
@@ -50,7 +55,8 @@ class Recorder {
     }
   }
 
-  stopRecording = () => {
+  stopRecording = (hasSpoken: boolean) => {
+    this.hasSpoken = hasSpoken
     if (this.mediaRecorder && this.isRecording) {
       this.analyser?.disconnect()
       this.mediaRecorder.stop()
