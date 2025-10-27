@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './app'
 import MyContext, { defaultContext } from './context/AppContext'
+import './styles/irishgrover.css'
 import './styles/montserrat.css'
 import './styles/style.css'
 

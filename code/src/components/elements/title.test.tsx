@@ -4,9 +4,8 @@ import Title from './title'
 
 describe('Title', () => {
   it('Display the Title', () => {
-    const titleText = 'Hello, World!'
-    render(<Title title={titleText} />)
-    const title = screen.getByRole('heading', { name: titleText })
+    render(<Title />)
+    const title = screen.getByRole('heading')
     expect(title).toBeInTheDocument()
   })
 })

@@ -13,12 +13,13 @@ interface StoryResponse {
 const SPEAKING_VOLUME = 190
 const TOTAL_SPEAK_TIME = 10000
 const TOTAL_SILENT_TIME = 3000
+const START_PLAYING = 'Start playing'
+const STOP_PLAYING = 'Stop playing'
 
 const AudioRecorder: React.FC = () => {
   const [tellerMessage, setTellerMessage] = useState('')
   const [userMessage, setUserMessage] = useState('')
-  const [connect, setConnect] = useState('Start playing')
-  const [isConnected, setIsConnected] = useState(false)
+  const [connect, setConnect] = useState(START_PLAYING)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isCurrentlyRecording, setIsCurrentlyRecording] = useState(false)
   const [audioSocketService] = useState(new AudioSocket())
@@ -39,20 +40,22 @@ const AudioRecorder: React.FC = () => {
     isSpeaking = false,
     startTime = 0,
     startSpeakTime = 0,
+    hasSpoken = false,
   ) => {
     const currentTime = new Date().getTime()
     if (
       currentTime - startTime >= TOTAL_SPEAK_TIME ||
       (!isSpeaking && currentTime - startSpeakTime > TOTAL_SILENT_TIME)
     ) {
-      stopRecording()
+      stopRecording(hasSpoken)
       return
     }
     const volume = recorder.current.getVolume()
     const newIsSpeaking = volume > SPEAKING_VOLUME
+    const newHasSpoken = hasSpoken || newIsSpeaking
     const newStartSpeakTime = isSpeaking ? currentTime : startSpeakTime
     setTimeout(() => {
-      updateVolume(newIsSpeaking, startTime, newStartSpeakTime)
+      updateVolume(newIsSpeaking, startTime, newStartSpeakTime, newHasSpoken)
     }, 50)
   }
 
@@ -74,56 +77,39 @@ const AudioRecorder: React.FC = () => {
     }
   }
 
-  const stopRecording = () => {
-    setIsPlaying(false)
+  const stopRecording = (hasSpoken: boolean) => {
     setIsCurrentlyRecording(false)
-    recorder.current.stopRecording()
+    recorder.current.stopRecording(hasSpoken)
+    if (!hasSpoken && connect == STOP_PLAYING) {
+      setTimeout(() => {
+        startRecord(isPlaying, false)
+      }, 500)
+    }
   }
 
-  const stopPlaying = () => {
-    setIsPlaying(false)
-  }
-
-  const doConnect = () => {
-    if (!isConnected) {
+  const startPlaying = async () => {
+    if (!isPlaying) {
       audioSocketService.connect(updateMessage)
       recorder.current.setCallback(audioSocketService.sendBlob)
-      setIsConnected(true)
-      setConnect('Stop playing')
+      setIsPlaying(true)
+      setConnect(STOP_PLAYING)
+      await startRecord(true, false)
+      setUserMessage('Start your story by speaking into the microphone...')
     } else {
       audioSocketService.disconnect()
-      setIsConnected(false)
-      setConnect('Start playing')
+      setIsPlaying(false)
+      setConnect(START_PLAYING)
     }
   }
 
   return (
     <>
-      <div className="text-center">
-        <CustomButton onClick={doConnect}>{connect} 🔌</CustomButton>
-        <CustomButton
-          onClick={async () => await startRecord(isConnected, isPlaying)}
-          disabled={isCurrentlyRecording || !isConnected || isPlaying}
-        >
-          Record 🎙️
-        </CustomButton>
-        <CustomButton
-          onClick={stopPlaying}
-          disabled={!isPlaying || !isConnected}
-        >
-          Stop Recording ⏹️
-        </CustomButton>
-        <span className="block mb-2 font-mono">
-          {!isConnected
-            ? 'Disconnected 🚫'
-            : isCurrentlyRecording
-              ? 'Recording 🎤'
-              : 'Idle 😴'}
-        </span>
+      <div className="text-center justify-center">
+        <CustomButton onClick={startPlaying}>{connect}</CustomButton>
       </div>
-      <div className="flex flex-col items-center justify-center text-center w-full space-y-2">
+      <div className="flex flex-col text-center w-full items-center space-y-2 flex-1 h-full min-h-0">
         <CustomContent text={userMessage} />
-        <CustomContent text={tellerMessage} />
+        <CustomContent text={tellerMessage} isSmall={false} />
       </div>
     </>
   )

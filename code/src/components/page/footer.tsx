@@ -1,9 +1,11 @@
 const Footer: React.FC = () => {
   const date = new Date().getFullYear()
   return (
-    <footer className="bottom-0 w-full text-center mt-5 mb-3 text-sm text-gray-400">
-      © JScoobyCed - {date}
-    </footer>
+    <>
+      <footer className="mb-2 left-0 w-full text-center text-sm text-gray-600 z-10">
+        © JScoobyCed - {date}
+      </footer>
+    </>
   )
 }
 
