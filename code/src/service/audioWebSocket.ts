@@ -1,6 +1,6 @@
 import { getApplicationData } from './applicationData'
 
-class AudioSocket {
+class AudioWebSocket {
   private serverUrl = getApplicationData().webSocketServer
     ? `${getApplicationData().webSocketScheme}://${getApplicationData().webSocketServer}:${getApplicationData().webSocketPort.toString()}${getApplicationData().webSocketPath}`
     : 'ws://localhost:6789/audio'
@@ -18,9 +18,9 @@ class AudioSocket {
     }
 
     this.socket.onmessage = (event: MessageEvent) => {
+      const data: string | ArrayBuffer = event.data as string | ArrayBuffer
       if (callback) {
-        callback(event.data as string | ArrayBuffer)
-      } else if (event.data instanceof Blob) {
+        callback(data)
       }
     }
   }
@@ -82,4 +82,4 @@ class AudioSocket {
   }
 }
 
-export default AudioSocket
+export default AudioWebSocket
