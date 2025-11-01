@@ -39,10 +39,7 @@ class Recorder {
       }
 
       this.mediaRecorder.onstop = () => {
-        if (!this.hasSpoken) {
-          this.hasSpoken = false
-          return
-        }
+        if (!this.hasSpoken) return
         const blob = new Blob(chunks, { type: 'audio/webm' })
         this.sendData(blob)
       }

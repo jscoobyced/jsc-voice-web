@@ -1,15 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { SPEAK_DATA } from '../../models/speak_data'
-import AudioSocket from '../../service/audioWebSocket'
-import { playBuffer } from '../../service/playAudio'
-import Recorder from '../../service/recorder'
+import React, { useState } from 'react'
+import PlayService from '../../service/playService'
+import UpdateService from '../../service/updateService'
 import CustomButton from '../elements/CustomButton'
 import CustomContent from '../elements/CustomContent'
-
-interface StoryResponse {
-  type: string
-  content: string
-}
 
 const START_PLAYING = 'Start playing'
 const STOP_PLAYING = 'Stop playing'
@@ -19,83 +12,19 @@ const AudioRecorder: React.FC = () => {
   const [userMessage, setUserMessage] = useState('')
   const [connect, setConnect] = useState(START_PLAYING)
   const [isPlaying, setIsPlaying] = useState(false)
-  const [isCurrentlyRecording, setIsCurrentlyRecording] = useState(false)
-  const [audioSocketService] = useState(new AudioSocket())
-  const recorder = useRef(new Recorder())
-
-  const updateMessage = (data: any) => {
-    if (typeof data === 'string') {
-      const response = JSON.parse(data) as StoryResponse
-      if (response.type === 'teller') setTellerMessage(response.content)
-      if (response.type === 'user') setUserMessage(response.content)
-    } else {
-      const blob = new Blob([data], { type: 'audio/wav' })
-      playBuffer(blob, async () => await startRecord(true, false))
-    }
-  }
-
-  const updateVolume = (
-    isSpeaking = false,
-    startTime = 0,
-    startSpeakTime = 0,
-    hasSpoken = false,
-  ) => {
-    const currentTime = new Date().getTime()
-    if (
-      currentTime - startTime >= SPEAK_DATA.TOTAL_SPEAK_TIME ||
-      (!isSpeaking &&
-        currentTime - startSpeakTime > SPEAK_DATA.TOTAL_SILENT_TIME)
-    ) {
-      stopRecording(hasSpoken)
-      return
-    }
-    const volume = recorder.current.getVolume()
-    const newIsSpeaking = volume > SPEAK_DATA.SPEAKING_VOLUME
-    const newHasSpoken = hasSpoken || newIsSpeaking
-    const newStartSpeakTime = isSpeaking ? currentTime : startSpeakTime
-    setTimeout(() => {
-      updateVolume(newIsSpeaking, startTime, newStartSpeakTime, newHasSpoken)
-    }, 50)
-  }
-
-  useEffect(() => {
-    if (isCurrentlyRecording) {
-      const currentTime = new Date().getTime()
-      updateVolume(false, currentTime, currentTime)
-    }
-  }, [isCurrentlyRecording])
-
-  const startRecord = async (
-    isCurrentlyConnected = false,
-    isCurrentlyPlaying = false,
-  ) => {
-    if (isCurrentlyConnected && !isCurrentlyPlaying) {
-      setIsPlaying(true)
-      await recorder.current.startRecording()
-      setIsCurrentlyRecording(true)
-    }
-  }
-
-  const stopRecording = (hasSpoken: boolean) => {
-    setIsCurrentlyRecording(false)
-    recorder.current.stopRecording(hasSpoken)
-    if (!hasSpoken && connect == STOP_PLAYING) {
-      setTimeout(() => {
-        startRecord(isPlaying, false)
-      }, SPEAK_DATA.RETRY_TIME)
-    }
-  }
+  const playService = new PlayService(
+    new UpdateService(setUserMessage, setTellerMessage),
+  )
 
   const startPlaying = async () => {
     if (!isPlaying) {
-      audioSocketService.connect(updateMessage)
-      recorder.current.setCallback(audioSocketService.sendBlob)
+      await playService.startPlaying()
       setIsPlaying(true)
       setConnect(STOP_PLAYING)
-      await startRecord(true, false)
       setUserMessage('Start your story by speaking into the microphone...')
+      setTellerMessage('')
     } else {
-      audioSocketService.disconnect()
+      playService.stopPlaying()
       setIsPlaying(false)
       setConnect(START_PLAYING)
     }
