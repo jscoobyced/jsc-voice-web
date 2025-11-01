@@ -1,10 +1,10 @@
 import { getApplicationData } from './applicationData'
 
 class AudioSocket {
-  serverUrl = getApplicationData().webSocketServer
+  private serverUrl = getApplicationData().webSocketServer
     ? `${getApplicationData().webSocketScheme}://${getApplicationData().webSocketServer}:${getApplicationData().webSocketPort.toString()}${getApplicationData().webSocketPath}`
     : 'ws://localhost:6789/audio'
-  socket?: WebSocket
+  private socket?: WebSocket
 
   connect = (callback?: (data: string | ArrayBuffer) => void) => {
     this.socket = new WebSocket(this.serverUrl)
@@ -69,7 +69,7 @@ class AudioSocket {
     }
   }
 
-  convertBlob = (
+  private convertBlob = (
     blob: Blob,
     callback: (data: Uint8Array<ArrayBuffer>) => void,
   ) => {

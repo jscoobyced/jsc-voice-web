@@ -17,7 +17,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   type = 'button',
 }) => {
   const base =
-    'px-6 py-3 m-5 font-irish-grover text-4xl focus:outline-none transition ease-in-out duration-200 transform shadow-sm disabled:opacity-50 disabled:cursor-not-allowed rounded-full hover:scale-105 bg-amber-100'
+    'px-6 py-3 m-5 font-irish-grover text-4xl focus:outline-none transition ease-in-out duration-200 transform shadow-sm rounded-full hover:scale-105 bg-amber-100'
 
   return (
     <button

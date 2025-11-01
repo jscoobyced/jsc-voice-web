@@ -83,7 +83,7 @@ describe('recorder', () => {
     expect(recorder.isRecording).toBe(false)
     await recorder.startRecording()
     expect(recorder.isRecording).toBe(true)
-    recorder.stopRecording()
+    recorder.stopRecording(true)
     expect(recorder.isRecording).toBe(false)
   })
 
@@ -95,7 +95,7 @@ describe('recorder', () => {
     await recorder.startRecording()
     // Wait to ensure ondataavailable is called
     await new Promise((resolve) => setTimeout(resolve, 200))
-    recorder.stopRecording()
+    recorder.stopRecording(true)
 
     // Wait to ensure onstop is called
     await new Promise((resolve) => setTimeout(resolve, 100))
