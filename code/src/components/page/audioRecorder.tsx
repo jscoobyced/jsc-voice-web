@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { SPEAK_DATA } from '../../models/speak_data'
 import AudioSocket from '../../service/audioWebSocket'
 import { playBuffer } from '../../service/playAudio'
 import Recorder from '../../service/recorder'
@@ -10,9 +11,6 @@ interface StoryResponse {
   content: string
 }
 
-const SPEAKING_VOLUME = 190
-const TOTAL_SPEAK_TIME = 10000
-const TOTAL_SILENT_TIME = 3000
 const START_PLAYING = 'Start playing'
 const STOP_PLAYING = 'Stop playing'
 
@@ -44,14 +42,15 @@ const AudioRecorder: React.FC = () => {
   ) => {
     const currentTime = new Date().getTime()
     if (
-      currentTime - startTime >= TOTAL_SPEAK_TIME ||
-      (!isSpeaking && currentTime - startSpeakTime > TOTAL_SILENT_TIME)
+      currentTime - startTime >= SPEAK_DATA.TOTAL_SPEAK_TIME ||
+      (!isSpeaking &&
+        currentTime - startSpeakTime > SPEAK_DATA.TOTAL_SILENT_TIME)
     ) {
       stopRecording(hasSpoken)
       return
     }
     const volume = recorder.current.getVolume()
-    const newIsSpeaking = volume > SPEAKING_VOLUME
+    const newIsSpeaking = volume > SPEAK_DATA.SPEAKING_VOLUME
     const newHasSpoken = hasSpoken || newIsSpeaking
     const newStartSpeakTime = isSpeaking ? currentTime : startSpeakTime
     setTimeout(() => {
@@ -83,7 +82,7 @@ const AudioRecorder: React.FC = () => {
     if (!hasSpoken && connect == STOP_PLAYING) {
       setTimeout(() => {
         startRecord(isPlaying, false)
-      }, 500)
+      }, SPEAK_DATA.RETRY_TIME)
     }
   }
 
