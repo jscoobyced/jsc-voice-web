@@ -18,19 +18,19 @@ fi
 
 prepare_environment() {
     # Reset default environment
-    rm ./${SRC_DIR}/vitest.config.ts
+    if [ -f ./${SRC_DIR}/vitest.config.ts ]; then
+        rm ./${SRC_DIR}/vitest.config.ts
+    fi
     cp ./etc/tpl/package.json.tpl ./${SRC_DIR}/package.json
     cp ./etc/tpl/tsconfig.json.tpl ./${SRC_DIR}/tsconfig.json
     cp ./etc/tpl/vite.config.ts.tpl ./${SRC_DIR}/vite.config.ts
     cp ./etc/tpl/eslint.config.mjs.tpl ./${SRC_DIR}/eslint.config.mjs
     cp ./etc/tpl/index.html.tpl ./${SRC_DIR}/index.html
 
-
     if [ "Y" = "$INCLUDE_TEST" ];
     then
         cp ./etc/tpl/tsconfig.json.test.tpl ./${SRC_DIR}/tsconfig.json
         cp ./etc/tpl/vite.config.test.ts.tpl ./${SRC_DIR}/vite.config.ts
-        cp ./etc/tpl/vitest.config.ts.tpl ./${SRC_DIR}/vitest.config.ts
     fi
 
     if [ "Y" = "$INCLUDE_REACT" ];

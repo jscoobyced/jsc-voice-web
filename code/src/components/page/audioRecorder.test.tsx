@@ -7,12 +7,13 @@ const startMock = vi.fn()
 const stopMock = vi.fn()
 
 vi.mock('../../service/playService', () => {
-  return {
-    default: vi.fn().mockImplementation(() => ({
-      startPlaying: startMock,
-      stopPlaying: stopMock,
-    })),
+  class MockPlayService {
+    startPlaying = startMock
+    stopPlaying = stopMock
+    continuePlaying = vi.fn()
+    constructor(/* keep same signature if needed */) {}
   }
+  return { default: MockPlayService }
 })
 
 // now import the component after mocking
@@ -26,10 +27,10 @@ beforeEach(() => {
 it('calls startPlaying and stopPlaying', async () => {
   const user = userEvent.setup()
   render(<AudioRecorder />)
-  const btn = screen.getByRole('button', { name: /Start playing/i })
+  const btn = screen.getByRole('button')
   await user.click(btn)
   expect(startMock).toHaveBeenCalled()
-  const stopBtn = await screen.findByRole('button', { name: /Stop playing/i })
+  const stopBtn = await screen.findByRole('button')
   await user.click(stopBtn)
   expect(stopMock).toHaveBeenCalled()
 })

@@ -1,8 +1,8 @@
 {
-  "name": "jsc-vite-ts",
+  "name": "jsc-voice-web",
   "private": false,
   "license": "MIT",
-  "version": "0.0.0",
+  "version": "0.4.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",

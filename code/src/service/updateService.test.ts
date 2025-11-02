@@ -64,6 +64,28 @@ describe('UpdateService', () => {
     void internal
   })
 
+  it('queueMessage pushes END_OF_CONVERSATION', async () => {
+    const setUser = vi.fn()
+    const setTeller = vi.fn()
+    const svc = new UpdateService(setUser, setTeller)
+
+    // push two messages: user then teller
+    svc.queueMessage(
+      JSON.stringify({ type: 'teller', content: 'END_OF_CONVERSATION' }),
+    )
+
+    // call private processQueue to exercise recursion path (typed access)
+    await (
+      svc as unknown as { processQueue: () => Promise<void> }
+    ).processQueue()
+
+    // queue should be empty afterwards
+    const internal = svc as unknown as { queue: unknown[] }
+    expect(internal.queue.length).toBe(0)
+
+    void internal
+  })
+
   it('processQueue handles "user" and "teller" string messages (recurses)', async () => {
     const setUser = vi.fn()
     const setTeller = vi.fn()

@@ -1,14 +1,5 @@
 import { vi } from 'vitest'
 
-// Mock navigator.mediaDevices.getUserMedia
-vi.stubGlobal('navigator', {
-  mediaDevices: {
-    getUserMedia: vi
-      .fn()
-      .mockResolvedValue(undefined as unknown as MediaStream),
-  },
-})
-
 vi.stubGlobal(
   'MediaStream',
   class MediaStream {
@@ -84,6 +75,18 @@ import Recorder from './recorder'
 // Basic test to ensure the testing setup works
 
 describe('recorder', () => {
+  beforeEach(() => {
+    vi.stubGlobal('navigator', {
+      mediaDevices: {
+        getUserMedia: () => {
+          return new Promise<MediaStream>((resolve) => {
+            resolve(new MediaStream())
+          })
+        },
+      },
+    })
+  })
+
   it('can start recording', async () => {
     const recorder = new Recorder()
     expect(recorder.isRecording).toBe(false)
@@ -133,15 +136,6 @@ describe('recorder', () => {
   })
 
   it('getVolume returns max frequency data', async () => {
-    vi.stubGlobal('navigator', {
-      mediaDevices: {
-        getUserMedia: () => {
-          return new Promise<MediaStream>((resolve) => {
-            resolve(new MediaStream())
-          })
-        },
-      },
-    })
     const recorder = new Recorder()
     const mockSendData = vi.fn()
     recorder.setCallback(mockSendData)
@@ -152,13 +146,18 @@ describe('recorder', () => {
     const volume = recorder.getVolume()
     expect(volume).toBeGreaterThanOrEqual(0)
     expect(volume).toBeLessThanOrEqual(255)
-
-    recorder.stopRecording(true)
   })
 
   it('getVolume returns -1 when analyser is not set', () => {
     const recorder = new Recorder()
     const volume = recorder.getVolume()
     expect(volume).toBe(-1)
+  })
+
+  it('can stop recording after starting', async () => {
+    const recorder = new Recorder()
+    await recorder.startRecording()
+    recorder.stopRecording(false)
+    expect(recorder.isRecording).toBe(false)
   })
 })
