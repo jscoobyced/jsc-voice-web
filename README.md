@@ -4,7 +4,17 @@
 
 Start the application to have a conversation with an AI powered story teller that will let you be the hero of the story.
 
-# Quick Start
+# Quick Start - Running the application
+
+To quickly get up and running:
+
+```
+docker run --env VITE_SERVER_WEBSOCKET_SERVER="web.yourdomain.com" -p 8080:80 jscdroiddev/jsc-voice-web:latest
+```
+
+Then open your browser on http://localhost:8080.
+
+# Quick Start - Development
 
 - Create a new Github repository using this repository as template
 - Clone your new repository
