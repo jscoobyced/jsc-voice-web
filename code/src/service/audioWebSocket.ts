@@ -1,13 +1,10 @@
 import { getApplicationData } from './applicationData'
 
 class AudioWebSocket {
-  private serverUrl = getApplicationData().webSocketServer
-    ? `${getApplicationData().webSocketScheme}://${getApplicationData().webSocketServer}:${getApplicationData().webSocketPort.toString()}${getApplicationData().webSocketPath}`
-    : 'ws://localhost:6789/audio'
   private socket?: WebSocket
 
   connect = (callback?: (data: string | ArrayBuffer) => void) => {
-    this.socket = new WebSocket(this.serverUrl)
+    this.socket = new WebSocket(this.buildServerUrl())
 
     this.socket.onopen = (event: Event) => {
       console.log('WebSocket connection:', event.type)
@@ -67,6 +64,16 @@ class AudioWebSocket {
       })
       return
     }
+  }
+
+  private buildServerUrl = (): string => {
+    console.log(
+      'Building WebSocket URL with application data:',
+      getApplicationData(),
+    )
+    return getApplicationData().webSocketServer
+      ? `${getApplicationData().webSocketScheme}://${getApplicationData().webSocketServer}:${getApplicationData().webSocketPort.toString()}${getApplicationData().webSocketPath}`
+      : 'ws://localhost:6789/audio'
   }
 
   private convertBlob = (
