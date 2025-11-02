@@ -1,6 +1,6 @@
 /// <reference types="vitest" />
 import tailwindcss from '@tailwindcss/vite'
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   plugins: [tailwindcss()],
@@ -9,7 +9,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['setup.ts'],
     coverage: {
-      extension: ['ts', 'tsx'],
+      include: ['src/**/*.ts', 'src/**/*.tsx'],
       exclude: [
         'src/main.ts',
         'src/main.tsx',
