@@ -14,7 +14,7 @@ describe('CustomContent', () => {
 
     // smallHeight should be applied
     expect(wrapper!.className).toContain('w-5/6')
-    expect(wrapper!.className).toContain('sm:w-1/2')
+    expect(wrapper!.className).toContain('md:w-1/2')
     expect(wrapper!.className).toContain('h-24')
     expect(wrapper!.className).toContain('sm:h-16')
     expect(wrapper!.className).toContain('my-2')
@@ -44,7 +44,7 @@ describe('CustomContent', () => {
 
     // check for large-height classes on the first container div found
     expect(wrapper!.className).toContain('w-5/6')
-    expect(wrapper!.className).toContain('sm:w-1/2')
+    expect(wrapper!.className).toContain('md:w-1/2')
     expect(wrapper!.className).toContain('h-84')
     expect(wrapper!.className).toContain('sm:h-56')
   })
