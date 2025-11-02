@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import PlayService from '../../service/playService'
 import UpdateService from '../../service/updateService'
 import CustomButton from '../elements/CustomButton'
@@ -12,9 +12,9 @@ const AudioRecorder: React.FC = () => {
   const [userMessage, setUserMessage] = useState('')
   const [connect, setConnect] = useState(START_PLAYING)
   const [isPlaying, setIsPlaying] = useState(false)
-  const playService = new PlayService(
-    new UpdateService(setUserMessage, setTellerMessage),
-  )
+  const playService = useRef(
+    new PlayService(new UpdateService(setUserMessage, setTellerMessage)),
+  ).current
 
   const startPlaying = async () => {
     if (!isPlaying) {

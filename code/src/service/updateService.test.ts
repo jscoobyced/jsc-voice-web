@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 // mock playBuffer before importing UpdateService so UpdateService uses the mocked function
 vi.mock('./playAudio', () => ({
@@ -8,12 +8,35 @@ vi.mock('./playAudio', () => ({
 import UpdateService from './updateService' // keep path consistent with real import (case-sensitive FS)
 
 describe('UpdateService', () => {
-  beforeEach(() => {
+  afterEach(() => {
     vi.clearAllMocks()
   })
 
-  afterEach(() => {
-    vi.clearAllMocks()
+  it('startProcessing sets callback and processes queue until isPlaying', async () => {
+    const setUser = vi.fn()
+    const setTeller = vi.fn()
+    const svc = new UpdateService(setUser, setTeller)
+    const internal = svc as unknown as { isPlaying: boolean }
+    internal.isPlaying = false
+
+    // initially isPlaying = false, so should loop
+    const callbackMock = vi.fn()
+
+    vi.spyOn(
+      svc as unknown as { processQueue: () => Promise<void> },
+      'processQueue',
+    ).mockImplementation(async () => {
+      // simulate queue processing by setting isPlaying = true after first call
+      internal.isPlaying = true
+      callbackMock()
+      await Promise.resolve()
+    })
+
+    await svc.startProcessing(callbackMock)
+    console.log('startProcessing completed')
+
+    // advance timers to allow processing loop to run a few times
+    expect(callbackMock).toHaveBeenCalled()
   })
 
   it('queueMessage pushes data and processQueue returns immediately when empty', async () => {

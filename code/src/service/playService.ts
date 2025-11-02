@@ -12,16 +12,19 @@ export default class PlayService {
 
   startPlaying = async () => {
     if (this.isPlaying) return
+    this.isPlaying = true
     this.audioSocketService.connect(this.updateService.queueMessage)
     this.recorder.setCallback(this.audioSocketService.sendBlob)
-    this.isPlaying = true
+    await this.continuePlaying()
+  }
+
+  continuePlaying = async () => {
     await this.recorder.startRecording()
     const currentTime = new Date().getTime()
     this.updateVolume(false, currentTime, currentTime, false)
   }
 
   stopPlaying = () => {
-    if (!this.isPlaying) return
     this.audioSocketService.disconnect()
     this.recorder.stopRecording(false)
     this.isPlaying = false
@@ -40,9 +43,11 @@ export default class PlayService {
         currentTime - startSpeakTime > SPEAK_DATA.TOTAL_SILENT_TIME)
     ) {
       this.recorder.stopRecording(hasSpoken)
-      this.updateService.startProcessing().catch((err: unknown) => {
-        console.error('startProcessing failed', err)
-      })
+      this.updateService
+        .startProcessing(this.continuePlaying)
+        .catch((err: unknown) => {
+          console.error('startProcessing failed', err)
+        })
       return
     }
     const volume = this.recorder.getVolume()
