@@ -15,6 +15,5 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 COPY etc/docker/nginx.conf /etc/nginx/
 COPY etc/docker/startme.sh /usr/local/bin/startme.sh
 RUN chmod +x /usr/local/bin/startme.sh
-EXPOSE 80
 
 CMD ["/usr/local/bin/startme.sh"]

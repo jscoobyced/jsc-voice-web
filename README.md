@@ -9,15 +9,15 @@ Start the application to have a conversation with an AI powered story teller tha
 To quickly get up and running:
 
 ```
-docker run --env VITE_SERVER_WEBSOCKET_SERVER="web.yourdomain.com" -p 8080:80 jscdroiddev/jsc-voice-web:latest
+docker run --rm --env VITE_SERVER_WEBSOCKET_SERVER="ws.your-domain.com" -p 8080:80 --name jjj jscdroiddev/jsc-voice-web
+
 ```
 
 Then open your browser on http://localhost:8080.
 
 # Quick Start - Development
 
-- Create a new Github repository using this repository as template
-- Clone your new repository
+- Clone the repository
 - Copy the `./code/.env.example` file to a `./code/.env` file
 - Edit the content of the `.env` file to match your preferences (see next section for details)
 - Run the following commands:
@@ -27,32 +27,12 @@ make setup
 make dev
 ```
 
-Alternatively to enable tests, React or both, choose just one of below:
-
-```
-make setup-with-tests
-make setup-with-react
-make setup-with-tests-and-react
-```
-
-then followed by `make dev`
-
 If you don't have `make` on your machine, simply run:
 
 ```
 ./etc/bin/setup.sh
 ./etc/bin/dev.sh
 ```
-
-Alternatively to enable tests, React or both, choose just one of below:
-
-```
-TESTS=Y ./etc/bin/setup.sh
-REACT=Y ./etc/bin/setup.sh
-TESTS=Y REACT=Y ./etc/bin/setup.sh
-```
-
-then followed by `./etc/bin/dev.sh`
 
 ## Setting up tests
 
@@ -84,6 +64,10 @@ Here are the current environment variables to set in the `code/.env` file:
 - VITE_APP_IMAGE: the marketing image to use, used in the meta tags for SEO
 - VITE_APP_IMAGE_HEIGHT: the height of the marketing image (required by Facebook for better optimization)
 - VITE_APP_IMAGE_WIDTH: the width of the marketing image (required by Facebook for better optimization)
+- VITE_SERVER_WEBSOCKET_SCHEME: the HTTP schema to use (i.e. ws or wss)
+- VITE_SERVER_WEBSOCKET_SERVER: the server running [JSC Voice server](https://github.com/jscoobyced/jsc-voice-web)
+- VITE_SERVER_WEBSOCKET_PORT: the port of the server
+- VITE_SERVER_WEBSOCKET_PATH: the path of the web-socket (default is empty)
 
 # Making changes
 

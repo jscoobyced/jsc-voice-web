@@ -33,5 +33,8 @@ prod: .dep
 build: .dep
 	./etc/bin/build.sh
 
+build-docker: build
+	./etc/bin/build-docker.sh
+
 deploy:
 	kubectl apply -k etc/k8s
