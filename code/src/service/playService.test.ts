@@ -1,4 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import PlayService from './playService'
+import UpdateService from './updateService'
 
 // mock speak data constants used by PlayService
 vi.mock('../models/speak_data', () => ({
@@ -44,9 +46,8 @@ vi.mock('./recorder', () => {
   }
 })
 
-// import module under test after mocks
+// import the mocked constructor reference (use unknown cast for safe inspection)
 import AudioWebSocketMock from './audioWebSocket'
-import PlayService from './playService'
 
 describe('PlayService', () => {
   beforeEach(() => {
@@ -64,18 +65,25 @@ describe('PlayService', () => {
   })
 
   it('startPlaying sets up websocket, recorder callback and starts recording; subsequent startPlaying returns early', async () => {
-    const updateService = {
+    const updateService: Pick<
+      UpdateService,
+      'queueMessage' | 'startProcessing'
+    > = {
       queueMessage: vi.fn(),
       startProcessing: vi.fn().mockResolvedValue(undefined),
     }
 
-    const svc = new PlayService(updateService as any)
+    const svc = new PlayService(updateService as unknown as UpdateService)
 
     // first startPlaying should call connect and startRecording and set callback
     await svc.startPlaying()
 
-    // ensure AudioWebSocket constructor was called and instance connect invoked
-    expect((AudioWebSocketMock as any).mock).toBeDefined()
+    // ensure the mocked AudioWebSocket constructor was used (function) and connect invoked
+    expect(typeof AudioWebSocketMock).toBe('function')
+    // access mock property in a type-safe manner
+    const mocked = AudioWebSocketMock as unknown as { mock?: unknown }
+    expect(mocked.mock).toBeDefined()
+
     expect(connectMock).toHaveBeenCalledWith(updateService.queueMessage)
 
     // recorder instance setCallback must be wired to websocket.sendBlob
@@ -89,12 +97,15 @@ describe('PlayService', () => {
   })
 
   it('stopPlaying disconnects and stops recording and is safe when not playing', async () => {
-    const updateService = {
+    const updateService: Pick<
+      UpdateService,
+      'queueMessage' | 'startProcessing'
+    > = {
       queueMessage: vi.fn(),
       startProcessing: vi.fn().mockResolvedValue(undefined),
     }
 
-    const svc = new PlayService(updateService as any)
+    const svc = new PlayService(updateService as unknown as UpdateService)
 
     // calling stopPlaying when not started should do nothing
     svc.stopPlaying()
@@ -110,36 +121,62 @@ describe('PlayService', () => {
   })
 
   it('updateVolume stops recording and calls startProcessing (handles startProcessing rejection)', async () => {
-    const updateService = {
+    const updateService: Pick<
+      UpdateService,
+      'queueMessage' | 'startProcessing'
+    > = {
       queueMessage: vi.fn(),
       startProcessing: vi.fn().mockRejectedValue(new Error('boom')),
     }
-    const svc = new PlayService(updateService as any)
+    const svc = new PlayService(updateService as unknown as UpdateService)
 
     // invoke updateVolume such that currentTime - startTime >= TOTAL_SPEAK_TIME
     // use internal private method via cast
     const now = Date.now()
     // call with startTime far in past
-    await (svc as any).updateVolume(false, now - 2000, now - 2000, false)
+    await (
+      svc as unknown as {
+        updateVolume: (
+          a: boolean,
+          b: number,
+          c: number,
+          d: boolean,
+        ) => Promise<void>
+      }
+    ).updateVolume(false, now - 2000, now - 2000, false)
 
     // stopRecording should have been called (hasSpoken false)
     expect(stopRecordingMock).toHaveBeenCalledWith(false)
 
     // startProcessing was called and rejected -> ensure rejection path logs error
-    const spyErr = vi.spyOn(console, 'error').mockImplementation(() => {})
-    // call again to exercise .catch logging (we call with startProcessing already mocked to reject)
-    await (svc as any).updateVolume(false, now - 2000, now - 2000, false)
+    const spyErr = vi.spyOn(console, 'error').mockImplementation(() => {
+      void 0
+    })
+    // call again to exercise .catch logging
+    await (
+      svc as unknown as {
+        updateVolume: (
+          a: boolean,
+          b: number,
+          c: number,
+          d: boolean,
+        ) => Promise<void>
+      }
+    ).updateVolume(false, now - 2000, now - 2000, false)
     expect(updateService.startProcessing).toHaveBeenCalled()
     expect(spyErr).toHaveBeenCalled()
     spyErr.mockRestore()
   })
 
   it('updateVolume schedules recursive checks when thresholds not met and respects SPEAKING_VOLUME', async () => {
-    const updateService = {
+    const updateService: Pick<
+      UpdateService,
+      'queueMessage' | 'startProcessing'
+    > = {
       queueMessage: vi.fn(),
       startProcessing: vi.fn().mockResolvedValue(undefined),
     }
-    const svc = new PlayService(updateService as any)
+    const svc = new PlayService(updateService as unknown as UpdateService)
 
     // set getVolume to alternate values to exercise newIsSpeaking true path
     getVolumeMock.mockReturnValueOnce(10).mockReturnValueOnce(3)
@@ -148,7 +185,16 @@ describe('PlayService', () => {
     const startSpeakTime = startTime
 
     // call updateVolume where thresholds not met (currentTime - startTime small)
-    ;(svc as any).updateVolume(false, startTime, startSpeakTime, false)
+    await (
+      svc as unknown as {
+        updateVolume: (
+          a: boolean,
+          b: number,
+          c: number,
+          d: boolean,
+        ) => Promise<void>
+      }
+    ).updateVolume(false, startTime, startSpeakTime, false)
 
     // first call will read volume once (mockReturnValueOnce -> 10)
     expect(getVolumeMock).toHaveBeenCalledTimes(1)

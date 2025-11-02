@@ -1,12 +1,18 @@
-import { beforeEach, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 // mock playBuffer before importing UpdateService so UpdateService uses the mocked function
-vi.mock('./playAudio')
+vi.mock('./playAudio', () => ({
+  playBuffer: vi.fn(),
+}))
 
-import UpdateService from './updateService'
+import UpdateService from './updateService' // keep path consistent with real import (case-sensitive FS)
 
 describe('UpdateService', () => {
   beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
     vi.clearAllMocks()
   })
 
@@ -16,14 +22,23 @@ describe('UpdateService', () => {
     const svc = new UpdateService(setUser, setTeller)
 
     // processQueue should do nothing on empty queue
-    await (svc as any).processQueue()
+    await (
+      svc as unknown as { processQueue: () => Promise<void> }
+    ).processQueue()
     expect(setUser).not.toHaveBeenCalled()
     expect(setTeller).not.toHaveBeenCalled()
 
     // queueMessage should add an item that processQueue will consume
     svc.queueMessage(JSON.stringify({ type: 'user', content: 'hey' }))
-    // inspect private queue to ensure item added
-    expect((svc as any).queue.length).toBe(1)
+
+    // inspect private queue via a typed internal view instead of `any`
+    const internal = svc as unknown as { queue: unknown[] }
+    expect(internal.queue.length).toBe(1)
+
+    // satisfy linter for any potential unused vars (no-op)
+    void setUser
+    void setTeller
+    void internal
   })
 
   it('processQueue handles "user" and "teller" string messages (recurses)', async () => {
@@ -35,15 +50,20 @@ describe('UpdateService', () => {
     svc.queueMessage(JSON.stringify({ type: 'user', content: 'user-msg' }))
     svc.queueMessage(JSON.stringify({ type: 'teller', content: 'teller-msg' }))
 
-    // call private processQueue to exercise recursion path
-    await (svc as any).processQueue()
+    // call private processQueue to exercise recursion path (typed access)
+    await (
+      svc as unknown as { processQueue: () => Promise<void> }
+    ).processQueue()
 
     // both handlers should have been called
     expect(setUser).toHaveBeenCalledWith('user-msg')
     expect(setTeller).toHaveBeenCalledWith('teller-msg')
 
     // queue should be empty afterwards
-    expect((svc as any).queue.length).toBe(0)
+    const internal = svc as unknown as { queue: unknown[] }
+    expect(internal.queue.length).toBe(0)
+
+    void internal
   })
 
   it('processQueue handles binary/object items by calling playBuffer and marking isPlaying', async () => {
@@ -56,7 +76,17 @@ describe('UpdateService', () => {
     svc.queueMessage(buf)
 
     // call processQueue -> should call playBuffer and set isPlaying = true
-    await (svc as any).processQueue()
-    expect((svc as any).isPlaying).toBe(true)
+    await (
+      svc as unknown as { processQueue: () => Promise<void> }
+    ).processQueue()
+
+    const internal = svc as unknown as { isPlaying: boolean }
+    expect(internal.isPlaying).toBe(true)
+
+    // silence unused var warnings
+    void buf
+    void internal
+    void setUser
+    void setTeller
   })
 })

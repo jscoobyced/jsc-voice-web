@@ -31,9 +31,15 @@ vi.stubGlobal(
     }
     createAnalyser = () => {
       class Analyser {
-        fftSize = 0
+        fftSize = 128
+        frequencyBinCount = 64
         disconnect = () => {
           // Do nothing
+        }
+        getByteFrequencyData = (dataArray: Uint8Array) => {
+          for (let i = 0; i < dataArray.length; i++) {
+            dataArray[i] = Math.floor(Math.random() * 256) // Random values between 0-255
+          }
         }
       }
       return new Analyser()
@@ -124,5 +130,35 @@ describe('recorder', () => {
     }).not.toThrow(
       Error(`Error accessing microphone: ${expectedError.message}`),
     )
+  })
+
+  it('getVolume returns max frequency data', async () => {
+    vi.stubGlobal('navigator', {
+      mediaDevices: {
+        getUserMedia: () => {
+          return new Promise<MediaStream>((resolve) => {
+            resolve(new MediaStream())
+          })
+        },
+      },
+    })
+    const recorder = new Recorder()
+    const mockSendData = vi.fn()
+    recorder.setCallback(mockSendData)
+
+    await recorder.startRecording()
+
+    // Simulate analyser being set
+    const volume = recorder.getVolume()
+    expect(volume).toBeGreaterThanOrEqual(0)
+    expect(volume).toBeLessThanOrEqual(255)
+
+    recorder.stopRecording(true)
+  })
+
+  it('getVolume returns -1 when analyser is not set', () => {
+    const recorder = new Recorder()
+    const volume = recorder.getVolume()
+    expect(volume).toBe(-1)
   })
 })

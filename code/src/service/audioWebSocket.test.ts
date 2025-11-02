@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import * as applicationDataModule from './applicationData'
 import AudioWebSocket from './audioWebSocket'
 
@@ -12,13 +12,14 @@ class FakeWebSocket {
   readyState: number = FakeWebSocket.CLOSED
   send = vi.fn()
   close = vi.fn()
-  onopen?: (ev: any) => void
-  onclose?: (ev: any) => void
-  onmessage?: (ev: any) => void
+  onopen?: (ev: Event) => void
+  onclose?: (ev: CloseEvent) => void
+  onmessage?: (ev: MessageEvent) => void
 
   constructor(url: string) {
     this.url = url
-    console.log(`FakeWebSocket created with URL: ${url}`)
+    // useful for debugging failures in CI locally
+
     FakeWebSocket.instances.push(this)
   }
 }
@@ -28,12 +29,13 @@ class MockFileReader {
   result: ArrayBuffer | null = null
   onloadend?: () => void
 
-  readAsArrayBuffer(_blob: Blob) {
+  async readAsArrayBuffer(_blob: Blob): Promise<void> {
+    void _blob // unused parameter
     // schedule microtask so caller can assign onloadend synchronously afterwards
-    Promise.resolve().then(() => {
+    await Promise.resolve().then(() => {
       // create a small ArrayBuffer result for the test
       this.result = new Uint8Array([9, 8, 7]).buffer
-      this.onloadend && this.onloadend()
+      this.onloadend?.()
     })
   }
 }
@@ -42,9 +44,12 @@ describe('AudioWebSocket', () => {
   beforeEach(() => {
     // ensure fresh module evaluation per test
     FakeWebSocket.instances = []
-    // install globals
-    ;(global as any).WebSocket = FakeWebSocket as any
-    ;(global as any).FileReader = MockFileReader as any
+    // install globals with correct types
+    ;(globalThis as unknown as { WebSocket?: typeof FakeWebSocket }).WebSocket =
+      FakeWebSocket
+    ;(
+      globalThis as unknown as { FileReader?: typeof MockFileReader }
+    ).FileReader = MockFileReader
     vi.restoreAllMocks()
   })
 
@@ -53,7 +58,7 @@ describe('AudioWebSocket', () => {
     vi.resetAllMocks()
   })
 
-  it('uses application data to build server URL and calls connect/onmessage callback with string', async () => {
+  it('uses application data to build server URL and calls connect/onmessage callback with string', () => {
     // mock applicationData to provide custom server details
     vi.spyOn(applicationDataModule, 'getApplicationData').mockReturnValue({
       webSocketServer: 'myserver.local',
@@ -73,22 +78,22 @@ describe('AudioWebSocket', () => {
     expect(created.url).toBe('wss://myserver.local:1234/audio')
 
     // simulate message with string payload
-    created.onmessage && created.onmessage({ data: 'hello' })
+    created.onmessage?.({ data: 'hello' } as MessageEvent)
     expect(cb).toHaveBeenCalledWith('hello')
   })
 
-  it('passes ArrayBuffer messages to callback', async () => {
+  it('passes ArrayBuffer messages to callback', () => {
     const ws = new AudioWebSocket()
     const cb = vi.fn()
     ws.connect(cb)
 
     const created = FakeWebSocket.instances[0]
     const buf = new Uint8Array([1, 2, 3]).buffer
-    created.onmessage && created.onmessage({ data: buf })
+    created.onmessage?.({ data: buf } as MessageEvent)
     expect(cb).toHaveBeenCalledWith(buf)
   })
 
-  it('disconnect closes the socket', async () => {
+  it('disconnect closes the socket', () => {
     const ws = new AudioWebSocket()
     ws.connect()
     const created = FakeWebSocket.instances[0]
@@ -97,8 +102,10 @@ describe('AudioWebSocket', () => {
     expect(created.close).toHaveBeenCalled()
   })
 
-  it('sendMessage logs error when socket not open, rejects empty string, and sends when open', async () => {
-    const consoleErr = vi.spyOn(console, 'error').mockImplementation(() => {})
+  it('sendMessage logs error when socket not open, rejects empty string, and sends when open', () => {
+    const consoleErr = vi.spyOn(console, 'error').mockImplementation(() => {
+      // do nothing
+    })
     const ws = new AudioWebSocket()
     ws.connect()
     const created = FakeWebSocket.instances[0]
@@ -126,7 +133,9 @@ describe('AudioWebSocket', () => {
   })
 
   it('sendBlob logs when socket not open, logs when empty blob, and sends converted data when good', async () => {
-    const consoleErr = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const consoleErr = vi.spyOn(console, 'error').mockImplementation(() => {
+      // do nothing
+    })
     const ws = new AudioWebSocket()
     ws.connect()
     const created = FakeWebSocket.instances[0]
@@ -156,9 +165,8 @@ describe('AudioWebSocket', () => {
     await Promise.resolve()
 
     expect(created.send).toHaveBeenCalled()
-    const sentArg = created.send.mock.calls[0][0]
-    expect(sentArg).toBeInstanceOf(Uint8Array)
-    expect(Array.from(sentArg as Uint8Array)).toEqual([9, 8, 7]) // MockFileReader returns this buffer
+    const sentArg = created.send.mock.calls[0][0] as Uint8Array
+    expect(Array.from(sentArg)).toEqual([9, 8, 7]) // MockFileReader returns this buffer
     consoleErr.mockRestore()
   })
 })

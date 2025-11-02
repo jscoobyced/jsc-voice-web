@@ -67,10 +67,6 @@ class AudioWebSocket {
   }
 
   private buildServerUrl = (): string => {
-    console.log(
-      'Building WebSocket URL with application data:',
-      getApplicationData(),
-    )
     return getApplicationData().webSocketServer
       ? `${getApplicationData().webSocketScheme}://${getApplicationData().webSocketServer}:${getApplicationData().webSocketPort.toString()}${getApplicationData().webSocketPath}`
       : 'ws://localhost:6789/audio'
