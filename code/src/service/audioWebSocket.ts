@@ -7,11 +7,11 @@ class AudioWebSocket {
     this.socket = new WebSocket(this.buildServerUrl())
 
     this.socket.onopen = (event: Event) => {
-      console.log('WebSocket connection:', event.type)
+      void event
     }
 
     this.socket.onclose = (event: Event) => {
-      console.log('WebSocket connection:', event.type)
+      void event
     }
 
     this.socket.onmessage = (event: MessageEvent) => {

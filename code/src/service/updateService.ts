@@ -8,6 +8,7 @@ interface StoryResponse {
 export default class UpdateService {
   private queue: (string | ArrayBuffer)[] = []
   private isPlaying = false
+  private callback: (() => Promise<void>) | null = null
 
   constructor(
     private setUserMessage: (message: string) => void,
@@ -18,9 +19,11 @@ export default class UpdateService {
     this.queue.push(data)
   }
 
-  startProcessing = async () => {
+  startProcessing = async (callback?: () => Promise<void>) => {
+    if (callback) this.callback = callback
     while (!this.isPlaying) {
       await this.processQueue()
+      console.log('Processing queue, isPlaying:', this.isPlaying)
       await new Promise((resolve) => setTimeout(resolve, 100))
     }
   }
@@ -32,8 +35,13 @@ export default class UpdateService {
       const storyResponse: StoryResponse = JSON.parse(data) as StoryResponse
       if (storyResponse.type === 'user')
         this.setUserMessage(storyResponse.content)
-      else if (storyResponse.type === 'teller')
+      else if (storyResponse.type === 'teller') {
+        if (storyResponse.content === 'END_OF_CONVERSATION') {
+          await this.callback?.()
+          return
+        }
         this.setTellerMessage(storyResponse.content)
+      }
       await this.processQueue()
     } else if (typeof data === 'object') {
       this.isPlaying = true

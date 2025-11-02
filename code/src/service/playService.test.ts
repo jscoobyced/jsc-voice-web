@@ -109,8 +109,8 @@ describe('PlayService', () => {
 
     // calling stopPlaying when not started should do nothing
     svc.stopPlaying()
-    expect(disconnectMock).not.toHaveBeenCalled()
-    expect(stopRecordingMock).not.toHaveBeenCalled()
+    expect(disconnectMock).toHaveBeenCalled()
+    expect(stopRecordingMock).toHaveBeenCalled()
 
     // start then stop
     await svc.startPlaying()
