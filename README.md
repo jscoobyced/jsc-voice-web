@@ -9,7 +9,7 @@ Start the application to have a conversation with an AI powered story teller tha
 To quickly get up and running:
 
 ```
-docker run --rm --env VITE_SERVER_WEBSOCKET_SERVER="ws.your-domain.com" -p 8080:80 --name jjj jscdroiddev/jsc-voice-web
+docker run --rm --env VITE_SERVER_WEBSOCKET_SERVER="ws.your-domain.com" -p 8080:80 --name jsc-voice-web jscdroiddev/jsc-voice-web
 
 ```
 
